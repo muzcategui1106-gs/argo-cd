@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	synccommon "github.com/argoproj/argo-cd/engine/pkg/utils/kube/sync/common"
+
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -309,7 +311,7 @@ func TestSkipAutoSync(t *testing.T) {
 			Operation: argoappv1.Operation{
 				Sync: &argoappv1.SyncOperation{},
 			},
-			Phase: argoappv1.OperationFailed,
+			Phase: synccommon.OperationFailed,
 			SyncResult: &argoappv1.SyncOperationResult{
 				Revision: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
 				Source:   *app.Spec.Source.DeepCopy(),
@@ -350,7 +352,7 @@ func TestAutoSyncIndicateError(t *testing.T) {
 				Source: app.Spec.Source.DeepCopy(),
 			},
 		},
-		Phase: argoappv1.OperationFailed,
+		Phase: synccommon.OperationFailed,
 		SyncResult: &argoappv1.SyncOperationResult{
 			Revision: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			Source:   *app.Spec.Source.DeepCopy(),
@@ -394,7 +396,7 @@ func TestAutoSyncParameterOverrides(t *testing.T) {
 				},
 			},
 		},
-		Phase: argoappv1.OperationFailed,
+		Phase: synccommon.OperationFailed,
 		SyncResult: &argoappv1.SyncOperationResult{
 			Revision: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 		},
@@ -649,7 +651,7 @@ func TestSetOperationStateOnDeletedApp(t *testing.T) {
 		patched = true
 		return true, nil, apierr.NewNotFound(schema.GroupResource{}, "my-app")
 	})
-	ctrl.setOperationState(newFakeApp(), &argoappv1.OperationState{Phase: argoappv1.OperationSucceeded})
+	ctrl.setOperationState(newFakeApp(), &argoappv1.OperationState{Phase: synccommon.OperationSucceeded})
 	assert.True(t, patched)
 }
 

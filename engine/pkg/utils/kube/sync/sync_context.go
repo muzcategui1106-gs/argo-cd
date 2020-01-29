@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	resource2 "github.com/argoproj/argo-cd/engine/pkg/utils/resource"
+	resourceutil "github.com/argoproj/argo-cd/engine/pkg/utils/resource"
 
 	synccommon "github.com/argoproj/argo-cd/engine/pkg/utils/kube/sync/common"
 
@@ -98,6 +98,24 @@ func NewSyncContext(
 	if err != nil {
 		return nil, err
 	}
+	ctx := &syncContext{
+		resources:           groupResources(reconciliationResult),
+		hooks:               reconciliationResult.Hooks,
+		config:              restConfig,
+		dynamicIf:           dynamicIf,
+		disco:               disco,
+		extensionsclientset: extensionsclientset,
+		kubectl:             kubectl,
+		namespace:           namespace,
+		log:                 log,
+	}
+	for _, opt := range opts {
+		opt(ctx)
+	}
+	return ctx, nil
+}
+
+func groupResources(reconciliationResult ReconciliationResult) map[kubeutil.ResourceKey]reconciledResource {
 	resources := make(map[kube.ResourceKey]reconciledResource, 0)
 	for i := 0; i < len(reconciliationResult.Target); i++ {
 		res := reconciledResource{
@@ -113,21 +131,7 @@ func NewSyncContext(
 		}
 		resources[kube.GetResourceKey(obj)] = res
 	}
-	ctx := &syncContext{
-		resources:           resources,
-		hooks:               reconciliationResult.Hooks,
-		config:              restConfig,
-		dynamicIf:           dynamicIf,
-		disco:               disco,
-		extensionsclientset: extensionsclientset,
-		kubectl:             kubectl,
-		namespace:           namespace,
-		log:                 log,
-	}
-	for _, opt := range opts {
-		opt(ctx)
-	}
-	return ctx, nil
+	return resources
 }
 
 const (
@@ -521,7 +525,7 @@ func (sc *syncContext) ensureCRDReady(name string) {
 
 // applyObject performs a `kubectl apply` of a single resource
 func (sc *syncContext) applyObject(targetObj *unstructured.Unstructured, dryRun bool, force bool) (synccommon.ResultCode, string) {
-	validate := !resource2.HasAnnotationOption(targetObj, common.AnnotationSyncOptions, "Validate=false")
+	validate := !resourceutil.HasAnnotationOption(targetObj, common.AnnotationSyncOptions, "Validate=false")
 	message, err := sc.kubectl.ApplyResource(sc.config, targetObj, targetObj.GetNamespace(), dryRun, force, validate)
 	if err != nil {
 		return synccommon.ResultCodeSyncFailed, err.Error()
@@ -536,7 +540,7 @@ func (sc *syncContext) applyObject(targetObj *unstructured.Unstructured, dryRun 
 func (sc *syncContext) pruneObject(liveObj *unstructured.Unstructured, prune, dryRun bool) (synccommon.ResultCode, string) {
 	if !prune {
 		return synccommon.ResultCodePruneSkipped, "ignored (requires pruning)"
-	} else if resource2.HasAnnotationOption(liveObj, common.AnnotationSyncOptions, "Prune=false") {
+	} else if resourceutil.HasAnnotationOption(liveObj, common.AnnotationSyncOptions, "Prune=false") {
 		return synccommon.ResultCodePruneSkipped, "ignored (no prune)"
 	} else {
 		if dryRun {

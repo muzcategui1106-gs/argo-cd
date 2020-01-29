@@ -372,9 +372,9 @@ func TestSyncNamespaceAgainstCRD(t *testing.T) {
 func Test_syncTasks_multiStep(t *testing.T) {
 	t.Run("Single", func(t *testing.T) {
 		tasks := syncTasks{{liveObj: Annotate(NewPod(), common.AnnotationSyncWave, "-1"), phase: synccommon.SyncPhaseSync}}
-		assert.Equal(t, synccommon.SyncPhaseSync, tasks.phase())
+		assert.Equal(t, synccommon.SyncPhaseSync, string(tasks.phase()))
 		assert.Equal(t, -1, tasks.wave())
-		assert.Equal(t, synccommon.SyncPhaseSync, tasks.lastPhase())
+		assert.Equal(t, synccommon.SyncPhaseSync, string(tasks.lastPhase()))
 		assert.Equal(t, -1, tasks.lastWave())
 		assert.False(t, tasks.multiStep())
 	})
@@ -383,9 +383,9 @@ func Test_syncTasks_multiStep(t *testing.T) {
 			{liveObj: Annotate(NewPod(), common.AnnotationSyncWave, "-1"), phase: synccommon.SyncPhasePreSync},
 			{liveObj: Annotate(NewPod(), common.AnnotationSyncWave, "1"), phase: synccommon.SyncPhasePostSync},
 		}
-		assert.Equal(t, synccommon.SyncPhasePreSync, tasks.phase())
+		assert.Equal(t, synccommon.SyncPhasePreSync, string(tasks.phase()))
 		assert.Equal(t, -1, tasks.wave())
-		assert.Equal(t, synccommon.SyncPhasePostSync, tasks.lastPhase())
+		assert.Equal(t, synccommon.SyncPhasePostSync, string(tasks.lastPhase()))
 		assert.Equal(t, 1, tasks.lastWave())
 		assert.True(t, tasks.multiStep())
 	})

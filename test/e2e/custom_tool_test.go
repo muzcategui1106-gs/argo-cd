@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/argoproj/argo-cd/engine/pkg/utils/health"
+	. "github.com/argoproj/argo-cd/engine/pkg/utils/kube/sync/common"
 	. "github.com/argoproj/argo-cd/pkg/apis/application/v1alpha1"
 	. "github.com/argoproj/argo-cd/test/e2e/fixture"
 	. "github.com/argoproj/argo-cd/test/e2e/fixture/app"
+	"github.com/stretchr/testify/assert"
 )
 
 // make sure we can echo back the Git creds

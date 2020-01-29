@@ -1,7 +1,7 @@
 package hook
 
 import (
-	common2 "github.com/argoproj/argo-cd/engine/pkg/utils/kube/sync/common"
+	synccommon "github.com/argoproj/argo-cd/engine/pkg/utils/kube/sync/common"
 	resource2 "github.com/argoproj/argo-cd/engine/pkg/utils/resource"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
@@ -19,17 +19,17 @@ func IsHook(obj *unstructured.Unstructured) bool {
 
 func Skip(obj *unstructured.Unstructured) bool {
 	for _, hookType := range Types(obj) {
-		if hookType == common2.HookTypeSkip {
+		if hookType == synccommon.HookTypeSkip {
 			return len(Types(obj)) == 1
 		}
 	}
 	return false
 }
 
-func Types(obj *unstructured.Unstructured) []common2.HookType {
-	var types []common2.HookType
+func Types(obj *unstructured.Unstructured) []synccommon.HookType {
+	var types []synccommon.HookType
 	for _, text := range resource2.GetAnnotationCSVs(obj, common.AnnotationKeyHook) {
-		t, ok := common2.NewHookType(text)
+		t, ok := synccommon.NewHookType(text)
 		if ok {
 			types = append(types, t)
 		}

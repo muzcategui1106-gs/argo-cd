@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	. "github.com/argoproj/argo-cd/engine/pkg/utils/kube/sync/common"
+
 	"github.com/argoproj/argo-cd/engine/pkg/utils/io"
 
 	log "github.com/sirupsen/logrus"

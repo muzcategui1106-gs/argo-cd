@@ -719,7 +719,7 @@ func TestResourceResults_Find(t *testing.T) {
 }
 
 func TestResourceResults_PruningRequired(t *testing.T) {
-	needsPruning := &ResourceResult{Status: ResultCodePruneSkipped}
+	needsPruning := &ResourceResult{Status: common.ResultCodePruneSkipped}
 	tests := []struct {
 		name    string
 		r       ResourceResults
